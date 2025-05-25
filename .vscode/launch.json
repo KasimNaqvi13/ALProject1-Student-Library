@@ -2,22 +2,18 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Your own server",
+            "name": "Self-Learning",
             "request": "launch",
             "type": "al",
-            "environmentType": "OnPrem",
-            "server": "http://localhost:8080/BC200",
-            "serverInstance": "BC200",
-            "authentication": "UserPassword",
-            "startupObjectId": 50000,
+            "environmentType": "Sandbox",
+            "environmentName": "Self-Learning",
+            // "startupObjectId": 22,
             "startupObjectType": "Page",
             "breakOnError": "All",
             "launchBrowser": true,
             "enableLongRunningSqlStatements": true,
             "enableSqlInformationDebugger": true,
-            "tenant": "default",
-            "usePublicURLFromServer": true,
-            "port": 7049,
+            "tenant": "e3123855-b90f-4905-b124-e03d121c1490",
             "schemaUpdateMode": "Synchronize"
         }
     ]
