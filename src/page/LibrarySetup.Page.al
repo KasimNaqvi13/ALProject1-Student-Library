@@ -5,9 +5,11 @@ page 50012 "Library Setup"
 {
     ApplicationArea = All;
     Caption = 'Library Setup';
-    PageType = List;
+    PageType = Card;
     SourceTable = "Library Setup";
-    UsageCategory = Lists;
+    UsageCategory = Administration;
+    InsertAllowed = false;
+    DeleteAllowed = false;
 
     layout
     {
@@ -15,12 +17,7 @@ page 50012 "Library Setup"
         {
             repeater(General)
             {
-                field("Primary Key"; Rec."Primary Key")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Primary Key field.';
-                    Editable = false;
-                }
+                Caption = 'Student and Book Setup';
                 field("Student No"; Rec."Student No")
                 {
                     ApplicationArea = All;
@@ -49,4 +46,13 @@ page 50012 "Library Setup"
             }
         }
     }
+
+    trigger OnOpenPage()
+    begin
+        Rec.Reset();
+        if not rec.Get() then begin
+            Rec.Init();
+            rec.Insert();
+        end;
+    end;
 }
