@@ -10,10 +10,12 @@ table 50005 Department
         field(1; "Dept-Code"; Code[20])
         {
             DataClassification = ToBeClassified;
+            Caption = 'Dept-Code';
         }
         field(2; "Dept-Name"; Text[250])
         {
             DataClassification = ToBeClassified;
+            Caption = 'Dept-Name';
         }
     }
 
