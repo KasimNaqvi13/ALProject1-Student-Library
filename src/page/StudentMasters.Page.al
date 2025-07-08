@@ -62,11 +62,6 @@ page 50000 "Student Masters"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Document-No field.';
                 }
-                field("No-Series"; Rec."No-Series")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the No-Series field.';
-                }
             }
         }
     }

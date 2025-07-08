@@ -15,7 +15,7 @@ page 50012 "Library Setup"
     {
         area(content)
         {
-            repeater(General)
+            group(General)
             {
                 Caption = 'Student and Book Setup';
                 field("Student No"; Rec."Student No")

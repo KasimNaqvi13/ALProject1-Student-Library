@@ -19,6 +19,11 @@ page 50001 "Student Master"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Roll-No. field.';
+                    trigger OnAssistEdit()
+                    begin
+                        if Rec.AssistEdit() then
+                            CurrPage.Update();
+                    end;
                 }
                 field("Student-Name"; Rec."Student-Name")
                 {
@@ -59,11 +64,6 @@ page 50001 "Student Master"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Document-No field.';
-                }
-                field("No-Series"; Rec."No-Series")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the No-Series field.';
                 }
             }
         }

@@ -60,11 +60,6 @@ page 50010 "Student Master FactBox"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Document-No field.';
                 }
-                field("No-Series"; Rec."No-Series")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the No-Series field.';
-                }
             }
         }
     }

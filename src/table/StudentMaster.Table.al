@@ -3,32 +3,40 @@
 /// </summary>
 table 50000 StudentMaster
 {
-    DataClassification = ToBeClassified;
+    DataClassification = CustomerContent;
+    DataCaptionFields = "Roll-No.", "Student-Name";
+    LookupPageId = "Student Masters";
+    Caption = 'Student Master';
 
     fields
     {
         field(1; "Roll-No."; Code[20])
         {
             DataClassification = ToBeClassified;
+            Caption = 'Roll-No.';
 
             trigger OnValidate()
             begin
                 if "Roll-No." <> xRec."Roll-No." then begin
                     LibrarySetupRec.Get();
-                    NoSeriesMgt.TestManual(LibrarySetupRec."Student No");
+                    NoSeries.TestManual(LibrarySetupRec."Student No");
+                    "No. Series" := '';
                 end;
             end;
         }
         field(2; "Student-Name"; Text[250])
         {
             DataClassification = ToBeClassified;
+            Caption = 'Student-Name';
         }
         field(3; "Department-Code"; code[20])
         {
             TableRelation = Department;
+            Caption = 'Department-Code';
 
             trigger OnValidate()
             var
+                DeptRec: Record Department;
             begin
                 DeptRec.SetRange("Dept-Code", "Department-Code");
                 if DeptRec.FindFirst() then
@@ -38,14 +46,17 @@ table 50000 StudentMaster
         field(4; "Department-Name"; Text[250])
         {
             DataClassification = ToBeClassified;
+            Caption = 'Department-Name';
         }
         field(5; "Address"; Text[250])
         {
             DataClassification = ToBeClassified;
+            Caption = 'Address';
         }
         field(6; "Phone-No"; Text[14])
         {
             DataClassification = ToBeClassified;
+            Caption = 'Phone-No';
             trigger OnValidate()
             begin
                 if StrLen("Phone-No") <> 10 then
@@ -63,21 +74,25 @@ table 50000 StudentMaster
         field(7; "No-of-Book-Taken"; Decimal)
         {
             DataClassification = ToBeClassified;
+            Caption = 'No-of-Book-Taken';
         }
         field(8; "No-of-Book-Pending"; Decimal)
         {
             DataClassification = ToBeClassified;
+            Caption = 'No-of-Book-Pending';
         }
         field(9; "Document-No"; Code[20])
         {
             DataClassification = ToBeClassified;
+            Caption = 'Document-No';
         }
-        field(10; "No-Series"; Code[20])
+        field(10; "No. Series"; Code[20])
         {
+            Caption = 'No. Series';
+            Editable = false;
+            TableRelation = "No. Series";
             DataClassification = ToBeClassified;
         }
-
-
     }
 
     keys
@@ -93,47 +108,45 @@ table 50000 StudentMaster
         // Add changes to field groups here
     }
 
-    var
-        myInt: Integer;
-
     trigger OnInsert()
     begin
-        GenStuNo();
+        InsertNoSeries();
     end;
 
-    trigger OnModify()
+
+    local procedure InsertNoSeries()
     begin
-
-    end;
-
-    trigger OnDelete()
-    begin
-
-    end;
-
-    trigger OnRename()
-    begin
-
-    end;
-
-    var
-        LibrarySetupRec: Record "Library Setup";
-        NoSeriesMgt: Codeunit NoSeriesManagement;
-        DeptRec: Record Department;
-        StudentMasterRec: Record StudentMaster;
-
-    /// <summary>
-    /// GenStuNo.
-    /// </summary>
-    procedure GenStuNo()
-    begin
-        // generating student doc no number
-        if rec."Roll-No." = '' then begin
+        if "Roll-No." = '' then begin
             LibrarySetupRec.Get();
             LibrarySetupRec.TestField("Student No");
-            NoSeriesMgt.InitSeries(LibrarySetupRec."Student No", xRec."No-Series", WorkDate(), "Roll-No.", "No-Series");
+
+            if NoSeries.AreRelated(LibrarySetupRec."Student No", xRec."No. Series") then
+                "No. Series" := "No. Series"
+            else
+                "No. Series" := LibrarySetupRec."Student No";
+
+            "Roll-No." := NoSeries.GetNextNo("No. Series");
+            StudentMasterRec.readIsolation(IsolationLevel::ReadUncommitted);
+            StudentMasterRec.SetLoadFields("Roll-No.");
+            while StudentMasterRec.Get("Roll-No.") do
+                "Roll-No." := NoSeries.GetNextNo("No. Series");
         end;
     end;
 
+    procedure AssistEdit() Result: Boolean
+    begin
+        LibrarySetupRec.Get();
+        LibrarySetupRec.TestField("Student No");
+        if NoSeries.LookupRelatedNoSeries(LibrarySetupRec."Student No", xRec."No. Series", "No. Series") then begin
+            "Roll-No." := NoSeries.GetNextNo("No. Series");
+            exit(true);
+        end;
+    end;
+
+
+    var
+        LibrarySetupRec: Record "Library Setup";
+        StudentMasterRec: Record StudentMaster;
+        NoSeries: Codeunit "No. Series";
 
 }
