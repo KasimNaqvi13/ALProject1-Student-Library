@@ -45,4 +45,5 @@ function StopRecording() {
         recognition.stop();
         isRecording = false;
     }
+    
 }

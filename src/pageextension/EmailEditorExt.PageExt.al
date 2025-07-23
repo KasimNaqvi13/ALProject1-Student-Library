@@ -2,7 +2,7 @@ pageextension 50000 "Email Editor Ext" extends "Email Editor"
 {
     layout
     {
-        addlast("Email Inner Details")
+        addafter("Email Details")
         {
             usercontrol(SpeechControl; SpeechToTextAddin)
             {
@@ -16,20 +16,25 @@ pageextension 50000 "Email Editor Ext" extends "Email Editor"
                 end;
 
             }
-            field("Email Editors"; EmailBodytext)
+            group(SpeechRecognition)
             {
-                Caption = 'custom addin message';
-                ApplicationArea = All;
-                ToolTip = 'Specifies the content of the email.';
-                MultiLine = true;
-                ExtendedDatatype = RichContent;
+                Caption = 'Copilot Speech Messaging';
+                field("Email Editors"; EmailBodytext)
+                {
+                    Caption = 'Message with Copilot';
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the content of the email.';
+                    MultiLine = true;
+                    ExtendedDatatype = RichContent;
 
-                trigger OnValidate()
-                begin
-                    // EmailMessageImpl.SetBody(EmailBodytext);
-                    // EmailMessageImpl.Modify();
-                end;
+                    trigger OnValidate()
+                    begin
+                        // EmailMessageImpl.SetBody(EmailBodytext);
+                        // EmailMessageImpl.Modify();
+                    end;
+                }
             }
+
         }
     }
     actions
@@ -62,15 +67,29 @@ pageextension 50000 "Email Editor Ext" extends "Email Editor"
                     Message(EmailBodytext);
                 end;
             }
+
+            action("Enhance Mail With Copilot")
+            {
+                Caption = 'Enhance Mail With Copilot';
+                Tooltip = 'Enhance the email with copilot features.';
+                Image = MailSetup;
+                ApplicationArea = All;
+                trigger OnAction()
+                begin
+                    // Implement copilot enhancement logic here
+                    Message('Enhancing email with copilot features...');
+                end;
+            }
         }
         addlast(Promoted)
         {
             group(recordings)
             {
-                Caption = 'Recordings';
+                Caption = 'Email with copilot';
                 ShowAs = SplitButton;
                 actionref(StartRecordings; StartRecording) { }
                 actionref(StopRecordings; StopRecording) { }
+                actionref(EnhanceMailWithCopilot; "Enhance Mail With Copilot") { }
             }
         }
     }
