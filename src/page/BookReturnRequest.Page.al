@@ -46,7 +46,7 @@ page 50008 "Book Return Request"
         {
             part(StudentMaster; "Student Master FactBox")
             {
-                SubPageLink = "Roll-No." = field("Student-No");
+                SubPageLink = "Student ID" = field("Student-No");
             }
             part(BookMaster; "Book Master FactBox")
             {

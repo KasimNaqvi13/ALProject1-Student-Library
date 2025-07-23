@@ -24,7 +24,7 @@ table 50002 BookRequestHeader
 
             trigger OnValidate()
             begin
-                StuMast.SetRange("Roll-No.", "Student-No");
+                StuMast.SetRange("Student ID", "Student-No");
                 if StuMast.FindFirst() then
                     Rec.Validate("Student-Name", StuMast."Student-Name");
             end;

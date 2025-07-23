@@ -4,36 +4,41 @@
 table 50000 StudentMaster
 {
     DataClassification = CustomerContent;
-    DataCaptionFields = "Roll-No.", "Student-Name";
+    DataCaptionFields = "Student ID", "Student-Name";
     LookupPageId = "Student Masters";
     Caption = 'Student Master';
 
     fields
     {
-        field(1; "Roll-No."; Code[20])
+        field(1; "Student ID"; Code[20])
         {
             DataClassification = ToBeClassified;
+            OptimizeForTextSearch = true;
             Caption = 'Roll-No.';
 
             trigger OnValidate()
             begin
-                if "Roll-No." <> xRec."Roll-No." then begin
-                    LibrarySetupRec.Get();
-                    NoSeries.TestManual(LibrarySetupRec."Student No");
-                    "No. Series" := '';
-                end;
+                this.TestNoSeries();
             end;
         }
         field(2; "Student-Name"; Text[250])
         {
-            DataClassification = ToBeClassified;
+            OptimizeForTextSearch = true;
+            DataClassification = CustomerContent;
             Caption = 'Student-Name';
         }
-        field(3; "Department-Code"; code[20])
+
+        field(3; "Date of Birth"; Date)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Date of Birth';
+        }
+        field(4; "Department-Code"; code[20])
         {
             TableRelation = Department;
+            ValidateTableRelation = true;
             Caption = 'Department-Code';
-
+            DataClassification = CustomerContent;
             trigger OnValidate()
             var
                 DeptRec: Record Department;
@@ -43,61 +48,120 @@ table 50000 StudentMaster
                     Rec.Validate("Department-Name", DeptRec."Dept-Name");
             end;
         }
-        field(4; "Department-Name"; Text[250])
+        field(5; "Department-Name"; Text[250])
         {
-            DataClassification = ToBeClassified;
+            DataClassification = CustomerContent;
             Caption = 'Department-Name';
         }
-        field(5; "Address"; Text[250])
+        field(6; "Address"; Text[250])
         {
-            DataClassification = ToBeClassified;
+            DataClassification = CustomerContent;
             Caption = 'Address';
         }
-        field(6; "Phone-No"; Text[14])
+        field(7; "Phone-No"; Text[14])
         {
-            DataClassification = ToBeClassified;
-            Caption = 'Phone-No';
+            DataClassification = CustomerContent;
+            Caption = 'Contact Number';
+            OptimizeForTextSearch = true;
+            ExtendedDatatype = PhoneNo;
             trigger OnValidate()
+            var
+                i: Integer;
+                PhoneNoCannotContainLettersErr: Label 'must not contain letters';
+                PhoneNoAlreadyInUseErr: Label 'you are trying to enter is already in use, please enter a valid Phone-No';
             begin
-                if StrLen("Phone-No") <> 10 then
-                    Error('Please enter valid 10 digit Phone as per indian standard');
-
-                // Rec.Validate("Phone-No", ('+91-' + Rec."Phone-No"));
-                // Rec.Validate("Phone-No", '+91-' + Rec."Phone-No");
-                "Phone-No" := '+91-' + Rec."Phone-No";
-
+                for i := 1 to StrLen("Phone-No") do
+                    if ("Phone-No"[i] in ['A' .. 'Z', 'a' .. 'z']) then
+                        FieldError("Phone-No", PhoneNoCannotContainLettersErr);
+                // Clear(RegEX);
+                // Clear(Pattern);
+                // Pattern := '^[0-9]{10}';
+                // if RegEX.IsMatch(Rec."Phone-No", Pattern, 0) then begin
+                //     "Phone-No" := '+91-' + Rec."Phone-No"; //--> need to take out this line cause this one brings diffrence by postcodes loctions
+                StudentMasterRec.Reset();
                 StudentMasterRec.SetRange("Phone-No", Rec."Phone-No");
                 if StudentMasterRec.FindFirst() then
-                    Error('The number you trying to enter is already in use, please enter valid Phone-No');
+                    FieldError("Phone-No", PhoneNoAlreadyInUseErr);
             end;
         }
-        field(7; "No-of-Book-Taken"; Decimal)
+        field(8; "Registration Date"; Date)
         {
             DataClassification = ToBeClassified;
-            Caption = 'No-of-Book-Taken';
+            Caption = 'Registration Date';//workdate
         }
-        field(8; "No-of-Book-Pending"; Decimal)
-        {
-            DataClassification = ToBeClassified;
-            Caption = 'No-of-Book-Pending';
-        }
-        field(9; "Document-No"; Code[20])
+        // field(7; "No-of-Book-Taken"; Decimal)
+        // {
+        //     FieldClass = FlowField;
+        //     CalcFormula = - sum(BookLedgerEntry.Quantity where("Roll-No" = field("Roll-No."), Quantity = filter(< 0)));
+        // }
+        // field(8; "No-of-Book-Pending"; Decimal)
+        // {
+        //     FieldClass = FlowField;
+        //     CalcFormula = - sum(BookLedgerEntry.Quantity where("Roll-No" = field("Roll-No.")));
+        // }
+        field(11; "Document-No"; Code[20])
         {
             DataClassification = ToBeClassified;
             Caption = 'Document-No';
         }
-        field(10; "No. Series"; Code[20])
+        field(12; "No. Series"; Code[20])
         {
+            OptimizeForTextSearch = true;
+            DataClassification = SystemMetadata;
             Caption = 'No. Series';
-            Editable = false;
+            ToolTip = 'Specifies the number series used for student numbering.';
             TableRelation = "No. Series";
+        }
+
+        field(13; Image; Media)
+        {
+            DataClassification = ToBeClassified;
+            ExtendedDatatype = Person; // around struture
+        }
+
+        field(14; "Country/Region"; Code[250])
+        {
+            DataClassification = ToBeClassified;
+            Caption = 'Country/Region';
+            TableRelation = "Country/Region";
+            trigger OnValidate()
+            begin
+            end;
+        }
+        field(15; "State"; Code[20])
+        {
+            Caption = 'State';
+            // TableRelation = "State/Province";
+            DataClassification = ToBeClassified;
+        }
+        field(16; "PostCode"; Code[250])
+        {
+            DataClassification = ToBeClassified;
+            TableRelation = if ("Country/Region" = const()) "Post Code" else
+            if ("Country/Region" = filter(<> '')) "Post Code" where("Country/Region Code" = field("Country/Region"));
+            trigger OnValidate()
+            begin
+                // PostCodeRec.ValidatePostCode(City, PostCode, "Student-Name", "Country/Region", false);
+                // if PostCode = '' then begin
+                //     Clear(City);
+                //     Clear("Country/Region");
+                //     Clear(state);
+                // end;
+                // PostCodeRec.Reset();
+                // PostCodeRec.SetRange(Code, Rec.PostCode);
+                // if PostCodeRec.FindSet() then
+                //     Rec.state := PostCodeRec.State;
+            end;
+        }
+        field(17; "City"; Text[250])
+        {
             DataClassification = ToBeClassified;
         }
     }
 
     keys
     {
-        key(Key1; "Roll-No.")
+        key(Key1; "Student ID")
         {
             Clustered = true;
         }
@@ -107,16 +171,28 @@ table 50000 StudentMaster
     {
         // Add changes to field groups here
     }
-
+    #region triggers
     trigger OnInsert()
     begin
         InsertNoSeries();
     end;
 
+    trigger OnModify()
+    begin
 
+    end;
+
+    trigger OnDelete()
+    begin
+
+    end;
+    #endregion triggers
+
+
+    #region No series
     local procedure InsertNoSeries()
     begin
-        if "Roll-No." = '' then begin
+        if "Student ID" = '' then begin
             LibrarySetupRec.Get();
             LibrarySetupRec.TestField("Student No");
 
@@ -125,11 +201,11 @@ table 50000 StudentMaster
             else
                 "No. Series" := LibrarySetupRec."Student No";
 
-            "Roll-No." := NoSeries.GetNextNo("No. Series");
+            "Student ID" := NoSeries.GetNextNo("No. Series");
             StudentMasterRec.readIsolation(IsolationLevel::ReadUncommitted);
-            StudentMasterRec.SetLoadFields("Roll-No.");
-            while StudentMasterRec.Get("Roll-No.") do
-                "Roll-No." := NoSeries.GetNextNo("No. Series");
+            StudentMasterRec.SetLoadFields("Student ID");
+            while StudentMasterRec.Get("Student ID") do
+                "Student ID" := NoSeries.GetNextNo("No. Series");
         end;
     end;
 
@@ -138,15 +214,27 @@ table 50000 StudentMaster
         LibrarySetupRec.Get();
         LibrarySetupRec.TestField("Student No");
         if NoSeries.LookupRelatedNoSeries(LibrarySetupRec."Student No", xRec."No. Series", "No. Series") then begin
-            "Roll-No." := NoSeries.GetNextNo("No. Series");
+            "Student ID" := NoSeries.GetNextNo("No. Series");
             exit(true);
         end;
     end;
 
+    local procedure TestNoSeries()
+    begin
+        if "Student ID" <> xRec."Student ID" then begin
+            LibrarySetupRec.Get();
+            NoSeries.TestManual(LibrarySetupRec."Student No");
+            "No. Series" := '';
+        end;
+    end;
+    #endregion No series
 
+
+    #region Global Variables
     var
         LibrarySetupRec: Record "Library Setup";
         StudentMasterRec: Record StudentMaster;
         NoSeries: Codeunit "No. Series";
+    #endregion Global Variables
 
 }

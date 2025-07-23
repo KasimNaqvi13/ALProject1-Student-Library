@@ -16,7 +16,7 @@ page 50000 "Student Masters"
         {
             repeater(General)
             {
-                field("Roll-No."; Rec."Roll-No.")
+                field("Roll-No."; Rec."Student ID")
                 {
                     ApplicationArea = All;
 
@@ -47,16 +47,16 @@ page 50000 "Student Masters"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Phone-No field.';
                 }
-                field("No-of-Book-Taken"; Rec."No-of-Book-Taken")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the No-of-Book-Taken field.';
-                }
-                field("No-of-Book-Pending"; Rec."No-of-Book-Pending")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the No-of-Book-Pending field.';
-                }
+                // field("No-of-Book-Taken"; Rec."No-of-Book-Taken")
+                // {
+                //     ApplicationArea = All;
+                //     ToolTip = 'Specifies the value of the No-of-Book-Taken field.';
+                // }
+                // field("No-of-Book-Pending"; Rec."No-of-Book-Pending")
+                // {
+                //     ApplicationArea = All;
+                //     ToolTip = 'Specifies the value of the No-of-Book-Pending field.';
+                // }
                 field("Document-No"; Rec."Document-No")
                 {
                     ApplicationArea = All;
